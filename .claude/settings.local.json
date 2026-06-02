@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/boe/STM32Cube/Repository/**)",
+      "Read(//c/Users/boe/STM32CubeCLI/Repository/**)",
+      "Read(//c/Users/**)",
+      "Bash(xargs grep -l \"stm32\\\\|stlink\\\\|cmsis\")",
+      "Bash(xargs grep -l \"stlinkgdbtarget\\\\|CMSIS_PACK_ROOT\")"
+    ]
+  }
+}

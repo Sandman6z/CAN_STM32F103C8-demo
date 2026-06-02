@@ -38,10 +38,10 @@ void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN1;
-  hcan.Init.Prescaler = 36;
+  hcan.Init.Prescaler = 18;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan.Init.TimeSeg1 = CAN_BS1_3TQ;
+  hcan.Init.TimeSeg1 = CAN_BS1_5TQ;
   hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan.Init.TimeTriggeredMode = DISABLE;
   hcan.Init.AutoBusOff = DISABLE;
@@ -86,8 +86,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    // 使用默认映射（PB8/PB9），不要重映射！
-    // __HAL_AFIO_REMAP_CAN1_2() 会将引脚映射到 PA11/PA12，与实际硬件不符
+    __HAL_AFIO_REMAP_CAN1_2();
 
   /* USER CODE BEGIN CAN1_MspInit 1 */
 

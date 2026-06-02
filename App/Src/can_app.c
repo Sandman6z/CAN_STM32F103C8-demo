@@ -8,6 +8,9 @@ static uint8_t rx_data[8];
 static uint32_t tx_mailbox;
 static uint8_t tx_counter = 0;
 
+// 前向声明
+static void can_app_check_error(void);
+
 /**
  * @brief 配置 CAN 过滤器，接收所有帧
  */
@@ -75,6 +78,8 @@ void can_app_send(void)
     {
         uart_log_print("[TX] ERROR - Send failed, check bus connection\r\n");
     }
+
+    can_app_check_error();
 }
 
 /**
@@ -90,6 +95,31 @@ void can_app_receive(void)
                            (unsigned int)rx_header.StdId,
                            rx_data[0], rx_data[1], rx_data[2], rx_data[3],
                            rx_data[4], rx_data[5], rx_data[6], rx_data[7]);
+        }
+    }
+}
+
+/**
+ * @brief CAN 错误检查并打印状态
+ */
+static void can_app_check_error(void)
+{
+    uint32_t err = HAL_CAN_GetError(&hcan);
+    if (err != HAL_CAN_ERROR_NONE)
+    {
+        uint32_t esr = hcan.Instance->ESR;
+        uint8_t tec = (esr >> 16) & 0xFF;
+        uint8_t rec = (esr >> 8) & 0xFF;
+        uint8_t lec = esr & 0x07;
+
+        if (err & HAL_CAN_ERROR_BOF) {
+            uart_log_print("[CAN] BUS-OFF  TEC=%u  REC=%u  LEC=%u\r\n", tec, rec, lec);
+        } else if (err & HAL_CAN_ERROR_EPV) {
+            uart_log_print("[CAN] Error Passive  TEC=%u  REC=%u  LEC=%u\r\n", tec, rec, lec);
+        } else if (err & HAL_CAN_ERROR_EWG) {
+            uart_log_print("[CAN] Error Warning  TEC=%u  REC=%u  LEC=%u\r\n", tec, rec, lec);
+        } else {
+            uart_log_print("[CAN] Error=0x%lX  TEC=%u  REC=%u  LEC=%u\r\n", err, tec, rec, lec);
         }
     }
 }
